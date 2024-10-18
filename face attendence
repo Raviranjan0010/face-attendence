@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Attendance System with GPS and Date</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        video {
+            border: 2px solid #333;
+            width: 400px;
+            height: 300px;
+        }
+
+        #attendanceList {
+            margin-top: 20px;
+            border: 1px solid #333;
+            padding: 10px;
+            display: inline-block;
+            background-color: #fff;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Face Attendance System with GPS and Date</h1>
+
+    <video id="video" autoplay></video>
+    <br>
+    <button id="capture">Capture Face & GPS</button>
+
+    <div id="status"></div>
+
+    <div id="attendanceList">
+        <h2>Attendance Log</h2>
+        <ul id="logList">
+        </ul>
+    </div>
+
+    <script>
+        // Access the camera
+        const video = document.getElementById('video');
+        const captureButton = document.getElementById('capture');
+        const attendanceList = document.getElementById('logList');
+        const statusDiv = document.getElementById('status');
+
+        // Request camera access
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Error accessing camera: " + err);
+            });
+
+        // Handle face capture and GPS
+        captureButton.addEventListener('click', () => {
+            // Get the current date and time
+            const date = new Date();
+            const dateTimeString = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
+            // Get GPS location
+            if (navigator.geolocation) {
+                statusDiv.textContent = "Getting GPS location...";
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // Log the attendance with date, time, and GPS coordinates
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Face captured on ${dateTimeString} at (Lat: ${latitude}, Long: ${longitude})`;
+                    attendanceList.appendChild(listItem);
+
+                    // Clear the status message
+                    statusDiv.textContent = "";
+                }, (error) => {
+                    statusDiv.textContent = "Error getting GPS location: " + error.message;
+                });
+            } else {
+                statusDiv.textContent = "Geolocation is not supported by this browser.";
+            }
+
+            // You can replace this part with actual face recognition logic
+        });
+    </script>
+    
+</body>
+</html>
